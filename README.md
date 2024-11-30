@@ -7,57 +7,37 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Files Location
+### Middleware - app/Http/Middleware/RedisSanctumMiddleware.php
+Explanation
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The RedisSanctumMiddleware is a custom middleware designed to handle authentication using Laravel Sanctum tokens stored in Redis. This middleware improves the performance of token validation by reducing the need for frequent database queries.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The primary purpose of the RedisSanctumMiddleware is to authenticate API requests using tokens stored in Redis. If the token is not found in Redis, it falls back to querying the database and then stores the token information in Redis for future requests.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+How It Works
+- Retrieve Token: The middleware retrieves the bearer token from the request.
+- Check Redis: It checks if the token data is stored in Redis.
+- Fallback to Database: If the token data is not found in Redis, it queries the database for the token.
+- Store in Redis: The token data is then stored in Redis for future requests.
+- Set User Resolver: The middleware sets the user resolver using the token data.
+- Proceed with Request: The request proceeds to the next middleware or controller.
 
-## Learning Laravel
+### Routes - routes/api.php 
+Explanation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Route Definition: This route defines a GET request to the /user endpoint.
+- Middleware: The route is protected by the auth.redis_sanctum middleware.
+- Custom Middleware: The auth.redis_sanctum middleware is a custom middleware that authenticates requests using Laravel Sanctum tokens stored in Redis.
+- Request Handling: If the request is authenticated, the middleware allows access to the endpoint, and the authenticated user's information is returned.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+How It Works
 
-## Laravel Sponsors
+- Middleware Application: The auth.redis_sanctum middleware is applied to the /user endpoint.
+- Token Validation: The middleware retrieves the bearer token from the request and checks if the token data is stored in Redis.
+- Fallback to Database: If the token data is not found in Redis, the middleware queries the database for the token and stores the token data in Redis for future requests.
+- User Retrieval: If the token is valid, the middleware sets the - user resolver, and the authenticated user's information is returned by the route.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[CMS Max](https://www.cmsmax.com/)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Kernel - app/Http/Kernel.php
+In the Kernel.php file, we have registered a custom middleware called auth.redis_sanctum. This middleware is responsible for handling authentication using Redis to store and retrieve Sanctum tokens. By using Redis, we can improve the performance of token validation by avoiding frequent database queries.
+    
