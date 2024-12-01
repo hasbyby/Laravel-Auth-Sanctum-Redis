@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,5 +23,11 @@ Route::post('auth/register', \App\Http\Controllers\Api\Auth\RegisterController::
 Route::post('auth/login', \App\Http\Controllers\Api\Auth\LoginController::class);
 
 Route::middleware('auth.redis_sanctum')->get('/user', function (Request $request) {
+// Route::middleware('auth.redis_sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth.redis_sanctum')->group(function () {
+    Route::get('/Datauser', [UserController::class, 'get']);
 });
