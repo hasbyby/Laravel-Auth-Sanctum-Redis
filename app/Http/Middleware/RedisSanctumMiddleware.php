@@ -38,7 +38,7 @@ class RedisSanctumMiddleware
                 'updated_at' => $accessToken->updated_at,
             ];
 
-            Redis::set($tokenKey, json_encode($tokenData));
+            Redis::set($tokenKey, json_encode($tokenData), 'EX', 350);
         } else {
             $tokenData = json_decode($tokenData, true);
         }
