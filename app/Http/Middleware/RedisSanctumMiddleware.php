@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class RedisSanctumMiddleware
@@ -43,10 +44,18 @@ class RedisSanctumMiddleware
             $tokenData = json_decode($tokenData, true);
         }
 
-        $request->setUserResolver(function () use ($tokenData) {
-            $model = $tokenData['tokenable_type'];
-            return (new $model)->find($tokenData['tokenable_id']);
+        $userModel = $tokenData['tokenable_type'];
+        $user = (new $userModel)->find($tokenData['tokenable_id']);
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        // Set the authenticated user in the request and Auth facade
+        $request->setUserResolver(function () use ($user) {
+            return $user;
         });
+        Auth::setUser($user);
 
         return $next($request);
     }

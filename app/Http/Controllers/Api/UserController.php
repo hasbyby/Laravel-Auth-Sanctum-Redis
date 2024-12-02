@@ -10,12 +10,9 @@ class UserController extends Controller
 {
     public function get(Request $request)
     {
-
-        $user_id = $request->user()->id;
-        // dd(' ID USER ', $user_id);
         return [
-            'user' => $request->user(),
-            'user_id' => $user_id
+            'user' => Auth::user(),
+            'user_id' => Auth::user()->id,
         ];
     }
 }
