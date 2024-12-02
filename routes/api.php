@@ -22,12 +22,9 @@ use App\Http\Controllers\API\UserController;
 Route::post('auth/register', \App\Http\Controllers\Api\Auth\RegisterController::class);
 Route::post('auth/login', \App\Http\Controllers\Api\Auth\LoginController::class);
 
-Route::middleware('auth.redis_sanctum')->get('/user', function (Request $request) {
-// Route::middleware('auth.redis_sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth.redis_sanctum')->get('/user', [UserController::class, 'get']);
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
 // Route::middleware('auth.redis_sanctum')->group(function () {
-    Route::get('/Datauser', [UserController::class, 'get']);
-});
+    // Route::get('/Datauser', [UserController::class, 'get']);
+// });
